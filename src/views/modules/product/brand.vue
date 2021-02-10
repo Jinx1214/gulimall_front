@@ -63,6 +63,9 @@
         align="center"
         label="品牌logo"
       >
+      <template slot-scope="scope">
+        <img :src="scope.row.logo" height="100px" width="80px">
+      </template>
       </el-table-column>
       <el-table-column
         prop="descript"

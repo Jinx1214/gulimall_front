@@ -15,7 +15,8 @@
         <el-input v-model="dataForm.name" placeholder="品牌名称"></el-input>
       </el-form-item>
       <el-form-item label="品牌logo" prop="logo">
-        <el-input v-model="dataForm.logo" placeholder="品牌logo"></el-input>
+        <!--<el-input  placeholder="品牌logo"></el-input></el-input>-->
+        <singleUpload v-model="dataForm.logo"></singleUpload>
       </el-form-item>
       <el-form-item label="品牌描述" prop="descript">
         <el-input v-model="dataForm.descript" placeholder="品牌描述"></el-input>
@@ -25,6 +26,8 @@
           v-model="dataForm.showStatus"
           active-color="#13ce66"
           inactive-color="#ff4949"
+          :active-value="1"
+          :inactive-value="0"
         >
         </el-switch>
       </el-form-item>
@@ -46,7 +49,9 @@
 </template>
 
 <script>
+import singleUpload from "@/components/upload/singleUpload"
 export default {
+  components:{singleUpload},
   data() {
     return {
       visible: false,
@@ -71,7 +76,15 @@ export default {
           { required: true, message: "显示状态不能为空", trigger: "blur" },
         ],
         firstLetter: [
-          { required: true, message: "检索首字母", trigger: "blur" },
+          { validator: (rule, value, callback)=>{
+              if(value ===""){
+                callback(new Error('首字母不能为空'));
+              }else if(!/^[a-zA-Z]$/.test(value)){
+                callback(new Error('首字母只能是字母'));
+              }else{
+                callback();
+              }
+          }, trigger: "blur" },
         ],
         sort: [{ required: true, message: "排序不能为空", trigger: "blur" }],
       },
@@ -88,7 +101,7 @@ export default {
             url: this.$http.adornUrl(
               `/product/brand/info/${this.dataForm.brandId}`
             ),
-            method: "get",
+            method: "post",
             params: this.$http.adornParams(),
           }).then(({ data }) => {
             if (data && data.code === 0) {
